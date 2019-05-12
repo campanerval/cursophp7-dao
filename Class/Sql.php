@@ -20,19 +20,19 @@ class Sql extends PDO{
 
 	}
 
-	private function setParams($statment, $parameters=array()){//transforma a tabela num array
+	private function setParams($statement, $parameters=array()){//transforma a tabela num array
 		
 		foreach ($parameters as $key => $value) {
 				
-				$this->setParam($key,$value);
+				$this->setParam($statement, $key,$value);
 
 			}
 
 	}
 
-	private function setParam($statment,$key,$value){
+	private function setParam($statement,$key,$value){
 
-			$statment->bindParam($key,$value);//bindParam trata cada linha e valor da tabela, associando os nomes das coluna a seus valores
+			$statement->bindParam($key,$value);//bindParam trata cada linha e valor da tabela, associando os nomes das coluna a seus valores
 
 	}
 
