@@ -46,12 +46,7 @@ class Usuario{
 		));//filtragem de dados
 
 		if (count($result) > 0 ){
-			$row = $result[0];
-			
-			$this->setIdusuario($row['idusuario']);
-			$this->setDeslogin($row['deslogin']);
-			$this->setDessenha($row['dessenha']);
-			$this->setDtcadastro(new DateTime($row['dtcadastro']));
+			$this->setDados($result[0]);
 		}
 
 	}/*   fim metodo loadById  */
@@ -65,7 +60,7 @@ class Usuario{
 		return $sql->select("SELECT * FROM tb_usuarios ORDER BY idusuario");
 	}/*   fim metodo loadById  */
 
-/*   metodo para  trazer fazer uma consulta específica */
+/*   metodo para  fazer uma consulta específica */
 	public static function search($login){
 
 		$sql = new Sql();
@@ -82,28 +77,76 @@ class Usuario{
 			":PASSWORD"=>$password
 		));//filtragem de dados
 
-		if (count($result) > 0 ){
-			$row = $result[0];
+		if (count($result) > 0 ){			
+			$this->setDados($result[0]);
 			
-			$this->setIdusuario($row['idusuario']);
-			$this->setDeslogin($row['deslogin']);
-			$this->setDessenha($row['dessenha']);
-			$this->setDtcadastro(new DateTime($row['dtcadastro']));
-		}else {
+		} else {
 			throw new Exception('Login e/ou senha inválidos.');
 		}
 	}
+	public function setDados($dados){
+			$this->setIdusuario($dados['idusuario']);
+			$this->setDeslogin($dados['deslogin']);
+			$this->setDessenha($dados['dessenha']);
+			$this->setDtcadastro(new DateTime($dados['dtcadastro']));
+	}
 
-	public function __toString(){
+	/*Método para inserção de dados no banco*/
+	public function insert(){
+		$sql = new Sql();
+		//para inserir dados no banco, estamos usando uma storade procedure, iniciando-a com a palavra 	CALL . No SQL Server, a palavra usada é EXECUTE
+		$result = $sql->select("CALL sp_usuarios_insert(:LOGIN, :PASSWORD)",array(
+			":LOGIN"=>$this->getDeslogin(),
+			":PASSWORD"=>$this->getDessenha()
+		));
+
+		if (count($result) > 0) {
+			$this->setDados($result[0]);
+		}
+	}/*fim do método insert*/
+
+	public function update($login,$password){
+		$this->setDeslogin($login);
+		$this->setDessenha($password);
+		
+		$sql = new Sql();
+
+		$sql->query("UPDATE tb_usuarios SET deslogin = :LOGIN , dessenha = :PASSWORD WHERE idusuario = :ID", array(
+			":LOGIN"=>$this->getDeslogin(),
+			":PASSWORD"=>$this->getDessenha(),
+			":ID"=>$this->getIdusuario()
+		));
+	}
+
+	/*método para excluir linha de uma tabela*/
+	public function delete(){
+
+		$sql = new Sql();
+
+		$sql->query("DELETE FROM tb_usuarios WHERE idusuario = :ID", array(
+			':ID'=>$this->getIdusuario()
+		));
+	/*as instruções abiaxo servem para limpar os dados da memória do objeto*/
+		$this->setIdusuario(0);
+		$this->setDeslogin("");
+		$this->setDessenha("");
+		$this->setDtcadastro(new DateTime());
+	}/*fim do método delete*/
+
+	/*método mágico construct para atribuir valores aos atributos assim que instanciarmos a classe Usuario. Requer que sejam informadas essas variáveis na parametrização da classe*/
+	public function __construct($login = "", $password = ""){
+		$this->setDeslogin($login);
+		$this->setDessenha($password);
+	}
+
+	public function __toString(){//método de conversão do objeto para string e json_encode
 		return json_encode(array(
 			"idusuario"=>$this->getIdusuario(),
 			"deslogin"=>$this->getDeslogin(),
 			"dessenha"=>$this->getDessenha(),
 			"dtcadastro"=>$this->getDtcadastro()->format("d-m-Y H:i:s")
 		));
-	}
-
-	
+	}	
 
 }
 

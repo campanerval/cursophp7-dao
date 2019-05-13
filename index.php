@@ -16,10 +16,26 @@ echo json_encode($lista);*/
 echo json_encode($busca);*/
 
 //4ª - Retorna login e senha
-$acesso = new Usuario();
+/*$acesso = new Usuario();
 $acesso->login("user","12345");
+echo $acesso;*/
 
-echo $acesso;
+//4ª - Inserção de dados no banco
+/*$cadastro = new Usuario("cidadão","@cidadao");
+$cadastro->insert();//método criado na classe Usuário para inserçao de dados!
+echo $cadastro;*/
+
+//5ª - Atualizaçao de dados no banco
+/*$upd_cadastro = new Usuario();
+$upd_cadastro->loadById(12);
+$upd_cadastro->update("colaborador","semam123");
+echo $upd_cadastro;*/
+
+//6ª - Deleção de dados no banco
+$del = new Usuario();
+$del->loadById(7);
+$del->delete();
+echo $del;
 
 
 /*$sql = new Sql();//instanciando a classe
